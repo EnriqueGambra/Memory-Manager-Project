@@ -18,7 +18,6 @@ public class Menu {
     private ArrayList<MemoryBlock> freeMemory = new ArrayList();
     private ArrayList<MemoryBlock> removedProcesses = new ArrayList();
     private boolean maxReached = false;
-
     private boolean notFitInRemoved = false;
     
     public Menu(){
@@ -56,8 +55,7 @@ public class Menu {
             
             switch(menuChoice){
                 case 1:
-                    input();         
-                        //System.out.println(blocks.get(blocks.size() - 1).toString());
+                    input();
                     break;
                 case 2:
                     break;
@@ -134,6 +132,10 @@ public class Menu {
         
         maxReached = checkOverflow(processSize);
         
+        if(maxReached){
+            return;
+        }
+        
         if(!inArray && !maxReached){
             pids.add(pid);
         }
@@ -143,11 +145,11 @@ public class Menu {
         }
         else
         {
-            if(removedProcesses.size() > 0)
+            if(removedProcesses.size() > 0 && !inArray)
             {
                 for(int i = 0; i < removedProcesses.size(); i++)
                 {
-                    if(removedProcesses.get(i).getProcessSize() >= processSize)
+                    if(removedProcesses.get(i).getProcessSize() >= processSize && !inArray)
                     {
                         MemoryBlock newBlock = new MemoryBlock(this.pid, this.processSize, removedProcesses.get(i).getMin(), 
                                                 removedProcesses.get(i).getMin() + processSize);
@@ -201,5 +203,4 @@ public class Menu {
         System.out.println("Process " + blocks.get(i).getPid() + " was removed sucessfully!");
         blocks.remove(i);
     }
-
 }
