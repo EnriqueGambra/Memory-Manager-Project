@@ -64,6 +64,7 @@ public class Menu {
                     process = input.nextInt();
                     for(int i = 0; i < blocks.size(); i++) {
                         if(process == blocks.get(i).getPid()){
+                            removedProcesses.add(blocks.get(i));
                             blocks.remove(i);
                             pids.remove(i);
                             System.out.println("removed successfully");
@@ -141,12 +142,15 @@ public class Menu {
         }
         
         if(blocks.isEmpty() && !inArray){
-            blocks.add(new MemoryBlock(this.pid,this.processSize, 0, this.processSize));   
+            blocks.add(new MemoryBlock(this.pid,this.processSize, 0, this.processSize));
+            System.out.println("Inside blocksIsEmpty conditional");
         }
         else
         {
+            System.out.println("Before if removedProcesses statement");
             if(removedProcesses.size() > 0 && !inArray)
             {
+                System.out.println("Inside if removedProcesses, before for loop");
                 for(int i = 0; i < removedProcesses.size(); i++)
                 {
                     if(removedProcesses.get(i).getProcessSize() >= processSize && !inArray)
@@ -158,13 +162,15 @@ public class Menu {
                         System.out.println("PID = " + newBlock.getPid() + "Max = " + newBlock.getMax() + "Min = " + newBlock.getMin());
                         blocks.trimToSize();
                         blocks.add(newBlock);
+                        removedProcesses.remove(i);
                         break;
                     }
-                    break;
+                    //break;
                 }   
             }
             else
             {
+                System.out.println("In else");
                 MemoryBlock newBlock = new MemoryBlock(this.pid,this.processSize, blocks.get(blocks.size() - 1).getMax(), 0);
                 newBlock.setMax(newBlock.getMin() + newBlock.getProcessSize());
                 blocks.add(newBlock);
