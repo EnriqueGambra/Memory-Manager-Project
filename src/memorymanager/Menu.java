@@ -56,8 +56,6 @@ public class Menu {
             switch(menuChoice){
                 case 1:
                     input();
-                   
-                        //System.out.println(blocks.get(blocks.size() - 1).toString());
                     break;
                 case 2:
                     break;
@@ -69,6 +67,7 @@ public class Menu {
                             blocks.remove(i);
                             pids.remove(i);
                             System.out.println("removed successfully");
+
                         }
                     }
                     
@@ -77,14 +76,18 @@ public class Menu {
                     break;
                 case 5:
                     System.out.println();
+
                     System.out.println("PID\t\tProcess Size\t\tMin\t\tMax");
                     for(int i = 0; i < blocks.size(); i++){
                         System.out.printf("%d\t\t%d\t\t\t%d\t\t%d\n", 
+
                                 blocks.get(i).getPid(),
                                 blocks.get(i).getProcessSize(),
                                 blocks.get(i).getMin(),
                                 blocks.get(i).getMax());  
+
                     }
+
                     break;
                 case 6:
                     break;
@@ -93,6 +96,7 @@ public class Menu {
                 default:
                     System.out.println("Invalid input");
                     break;          
+
             }
         }
     }
@@ -128,6 +132,10 @@ public class Menu {
         
         maxReached = checkOverflow(processSize);
         
+        if(maxReached){
+            return;
+        }
+        
         if(!inArray && !maxReached){
             pids.add(pid);
         }
@@ -137,11 +145,11 @@ public class Menu {
         }
         else
         {
-            if(removedProcesses.size() > 0)
+            if(removedProcesses.size() > 0 && !inArray)
             {
                 for(int i = 0; i < removedProcesses.size(); i++)
                 {
-                    if(removedProcesses.get(i).getProcessSize() >= processSize)
+                    if(removedProcesses.get(i).getProcessSize() >= processSize && !inArray)
                     {
                         MemoryBlock newBlock = new MemoryBlock(this.pid, this.processSize, removedProcesses.get(i).getMin(), 
                                                 removedProcesses.get(i).getMin() + processSize);
@@ -160,6 +168,7 @@ public class Menu {
                 MemoryBlock newBlock = new MemoryBlock(this.pid,this.processSize, blocks.get(blocks.size() - 1).getMax(), 0);
                 newBlock.setMax(newBlock.getMin() + newBlock.getProcessSize());
                 blocks.add(newBlock);
+
             }
             
             
@@ -170,7 +179,7 @@ public class Menu {
 //            }
         }
     }
-    
+  
     public static boolean checkOverflow(int processSize){
         maxForAll = 500;
         for(int i = 0; i < blocks.size(); i++){
@@ -185,6 +194,7 @@ public class Menu {
         }else{
             return false;
         }
+
     }
     
     public void removeProcess(int i)
@@ -193,5 +203,4 @@ public class Menu {
         System.out.println("Process " + blocks.get(i).getPid() + " was removed sucessfully!");
         blocks.remove(i);
     }
-    
 }
