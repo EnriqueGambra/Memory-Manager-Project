@@ -49,27 +49,13 @@ public class Menu {
             try{
                 menuChoice = input.nextInt();
             }catch(Exception e){
-                System.out.println("You typed in the wrong number, Sister Jane");
+                System.out.println("You typed in the wrong number");
             }
             
             switch(menuChoice){
                 case 1:
                     input();
-                    
-                        if(blocks.isEmpty()){
-                            blocks.add(new MemoryBlock(this.pid,this.processSize, 0, this.processSize));   
-                        }
-                        else
-                        {
-                            //maxReached = checkOverflow();
-                            if(!maxReached){
-                                MemoryBlock newBlock = new MemoryBlock(this.pid,this.processSize, blocks.get(blocks.size() - 1).getMax(), 0);
-                                newBlock.setMax(newBlock.getMin() + newBlock.getProcessSize());
-                                blocks.add(newBlock);
-                            }
-                            
-                            
-                        }
+                   
                         //System.out.println(blocks.get(blocks.size() - 1).toString());
                     break;
                 case 2:
@@ -136,7 +122,7 @@ public class Menu {
         for(int i = 0; i < pids.size(); i++){
             if(pid == pids.get(i)){
                 System.out.println("PID is in memory already");
-                inArray = true;   
+                return;  
             }
         }
         
@@ -146,13 +132,24 @@ public class Menu {
             pids.add(pid);
         }
         
+        if(blocks.isEmpty() && !inArray){
+            blocks.add(new MemoryBlock(this.pid,this.processSize, 0, this.processSize));   
+        }
+        else
+        {
+            if(!maxReached && !inArray){
+                MemoryBlock newBlock = new MemoryBlock(this.pid,this.processSize, blocks.get(blocks.size() - 1).getMax(), 0);
+                newBlock.setMax(newBlock.getMin() + newBlock.getProcessSize());
+                blocks.add(newBlock);
+            }
+        }
     }
     
     public static boolean checkOverflow(int processSize){
         maxForAll = 500;
         for(int i = 0; i < blocks.size(); i++){
             maxForAll = maxForAll - blocks.get(i).getProcessSize();
-            System.out.println("block pid " + blocks.get(i).getPid() + "max for all" + maxForAll);
+            System.out.println("block pid " + blocks.get(i).getPid() + " max for all " + maxForAll);
         }
         maxForAll -= processSize;
         
