@@ -91,7 +91,7 @@ public class Menu {
                     break;
                 case 5:
                     System.out.println();
-                    System.out.println("PID         Process Size        Min          Max");
+                    System.out.println("PID\t\t\t\t\tProcess Size\t\t\t\t\tMin\t\t\t\t\tMax");
                     for(int i = 0; i < blocks.size(); i++){
                         System.out.printf("%d           %d                   %d            %d\n", 
                                 blocks.get(i).getPid(),
