@@ -56,9 +56,10 @@ public class Menu {
             
             switch(menuChoice){
                 case 1:
-                    input();
+                    firstFitInput();
                     break;
                 case 2:
+                    bestFitInput();
                     break;
                 case 3:
                     System.out.print("What process would you like to remove? ");
@@ -131,7 +132,7 @@ public class Menu {
     }
     
     
-    public void input(){
+    public void firstFitInput(){
         System.out.print("Enter process id: ");
         pid = input.nextInt();
         System.out.print("Enter process size: ");
@@ -140,15 +141,15 @@ public class Menu {
         
         if(pid < 0){
             System.out.println("You CANNOT enter a pid number less than 1");
-            input();
+            firstFitInput();
         }
         
         if(processSize < 1){
             System.out.println("You CANNOT enter a process size less than 1");
-            input();
+            firstFitInput();
         }else if(processSize > 500){
             System.out.println("You CANNOT enter a process size greater than 500");
-            input();
+            firstFitInput();
         }
         
         //checks for pids, if they are in array already
@@ -272,7 +273,6 @@ public class Menu {
                                                                 + waitingQueue.get(i).getProcessSize()));
                     waitingQueue.remove(i);
                     removedProcesses.remove(j);
-                    
                     //Might have to add trimToSize for both arraylists
                 }
             }
@@ -311,4 +311,117 @@ public class Menu {
             }
         }
     }
+
+    private void bestFitInput() 
+    {
+        System.out.print("Enter process id: ");
+        pid = input.nextInt();
+        System.out.print("Enter process size: ");
+        processSize = input.nextInt();
+        
+        
+        if(pid < 0){
+            System.out.println("You CANNOT enter a pid number less than 1");
+            firstFitInput();
+        }
+        
+        if(processSize < 1){
+            System.out.println("You CANNOT enter a process size less than 1");
+            firstFitInput();
+        }else if(processSize > 500){
+            System.out.println("You CANNOT enter a process size greater than 500");
+            firstFitInput();
+        }
+        
+        //checks for pids, if they are in array already
+        for(int i = 0; i < pids.size(); i++){
+            if(pid == pids.get(i)){
+                System.out.println("PID is in memory already");
+                return;  
+            }
+        }
+        
+        maxReached = checkOverflow(processSize);
+        
+        if(maxReached){
+            return;
+        }
+        
+        if(!inArray && !maxReached){
+            pids.add(pid);
+        }
+        
+        if(blocks.isEmpty() && !inArray){
+            blocks.add(new MemoryBlock(this.pid,this.processSize, 0, this.processSize));
+            System.out.println("Inside blocksIsEmpty conditional");
+        }
+        else
+        {
+            System.out.println("Before if removedProcesses statement");
+            if(removedProcesses.size() > 0 && !inArray)
+            {
+                int nextRemovedBlockProcessSize = 500;
+                int currentProcessSize = processSize;
+                int sizeBetweenNextBlock = 500;
+                MemoryBlock blockBestFit = new MemoryBlock();
+                boolean foundBestFit = false;
+                for(int i = 0; i < removedProcesses.size(); i++)
+                {
+                    nextRemovedBlockProcessSize = removedProcesses.get(i).getProcessSize();
+                    if(currentProcessSize <= nextRemovedBlockProcessSize)
+                    {
+                        if(sizeBetweenNextBlock >= nextRemovedBlockProcessSize)
+                        {
+                            sizeBetweenNextBlock = nextRemovedBlockProcessSize;
+                            blockBestFit = removedProcesses.get(i);
+                            foundBestFit = true;
+                        }
+                    }
+                }
+                System.out.println("Inside if removedProcesses, before for loop");
+                for(int i = 0; i < removedProcesses.size(); i++)//For best fit, its going to have to loop and look through each removedProcess(free space)                                        
+                {                                               //spot, and then calculate which free space allows it to have the least amount of space
+                    if(removedProcesses.get(i).getProcessSize() >= processSize && !inArray)//left over after it is inserted...
+                    {
+                        if(foundBestFit = true)
+                        {
+                            MemoryBlock newBlock = blockBestFit;
+                            notFitInRemoved = true;
+                            blocks.trimToSize();
+                            blocks.add(newBlock);
+                            removedProcesses.add(new MemoryBlock(this.pid, removedProcesses.get(i).getProcessSize()-newBlock.getProcessSize(),
+                                                            newBlock.getMax(), blocks.get(i + 1).getMin()));
+                            removedProcesses.remove(i);
+                            removedProcesses.trimToSize();
+                            processAdded = true;
+                            foundBestFit = false;
+                            break;
+                        }
+                    }
+                    //break;
+                }   
+            }
+            if(processAdded == true)
+            {
+                
+            }
+            else
+            {
+                MemoryBlock newBlock = new MemoryBlock(this.pid,this.processSize, blocks.get(blocks.size() - 1).getMax(), 0);
+                newBlock.setMax(newBlock.getMin() + newBlock.getProcessSize());
+                blocks.add(newBlock);
+            }
+            
+            
+            
+//            if(!maxReached && !inArray){
+//                MemoryBlock newBlock = new MemoryBlock(this.pid,this.processSize, blocks.get(blocks.size() - 1).getMax(), 0);
+//                newBlock.setMax(newBlock.getMin() + newBlock.getProcessSize());
+//                blocks.add(newBlock);
+//            }
+        }
+        sortMemoryBlocks();
+    }
+
+    
 }
