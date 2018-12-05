@@ -3,7 +3,7 @@ package memorymanager;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class MemoryBlock {
+public  class MemoryBlock  {
     private int pid, processSize, min, max;
     
     public MemoryBlock(){
@@ -58,4 +58,5 @@ public class MemoryBlock {
         s += this.max + "\n";
         return s;
     }
+
 }
