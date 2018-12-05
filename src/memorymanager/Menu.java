@@ -10,14 +10,14 @@ public class Menu {
     private Scanner input = new Scanner(System.in);
     
     
-    private int pid, processSize;
+    static private int pid, processSize;
     private int min = 0;
     private int maxCapacity = 0;
     static private int maxForAll = 500;
-    private boolean processAdded = true;
+    private boolean processAdded = false;
     static private ArrayList<MemoryBlock> blocks = new ArrayList();
     private ArrayList<MemoryBlock> removedProcesses = new ArrayList();
-    private MemoryBlock[] sortedMemory;
+    static private ArrayList<MemoryBlock> waitingQueue = new ArrayList();
     private boolean maxReached = false;
     private boolean notFitInRemoved = false;
     
@@ -69,11 +69,34 @@ public class Menu {
                             blocks.remove(i);
                             pids.remove(i);
                             System.out.println("removed successfully");
-
+                            int waitSize = waitingQueue.size();
+                            if(waitingQueue.size() > 0)
+                            {
+                             for(int j = 0; j < waitSize; j++)
+                             {
+                                if(waitingQueue.size() > 0)
+                                {
+                                addInWaitingQueue();  
+                                }
+                             }
+                            }
                         }
                     }
                     break;
                 case 4:
+                    if(waitingQueue.size() > 0)
+                    {
+                        System.out.println("PID\t\tProcess Size\t\tMin\t\tMax");
+                        for(int i = 0; i < waitingQueue.size(); i++)
+                        {
+                            System.out.printf("%d\t\t%d\t\t\t%d\t\t%d\n", 
+
+                                waitingQueue.get(i).getPid(),
+                                waitingQueue.get(i).getProcessSize(),
+                                waitingQueue.get(i).getMin(),
+                                waitingQueue.get(i).getMax()); 
+                        }
+                    }
                     break;
                 case 5:
                     System.out.println();
@@ -88,13 +111,6 @@ public class Menu {
                                 blocks.get(i).getMin(),
                                 blocks.get(i).getMax()); 
                     }
-                    
-                    //if(freeMemory.size() > 0)
-                    //{
-                    //System.out.println("Free memory array:" + Integer.toString(freeMemory.get(0).getPid()) + Integer.toString(freeMemory.get(0).getProcessSize())
-                      //                  + " Min = " + Integer.toString(freeMemory.get(0).getMin()) + " Max = " +
-                      //                    Integer.toString(freeMemory.get(0).getMax()));
-                    //}
                     break;
                 case 6:
                     break;
@@ -170,18 +186,23 @@ public class Menu {
                                                         newBlock.getMax(), blocks.get(i + 1).getMin()));
                         removedProcesses.remove(i);
                         removedProcesses.trimToSize();
+                        processAdded = true;
                         break;
                     }
                     //break;
                 }   
+            }
+            if(processAdded == true)
+            {
+                
             }
             else
             {
                 MemoryBlock newBlock = new MemoryBlock(this.pid,this.processSize, blocks.get(blocks.size() - 1).getMax(), 0);
                 newBlock.setMax(newBlock.getMin() + newBlock.getProcessSize());
                 blocks.add(newBlock);
-
             }
+            
             
             
 //            if(!maxReached && !inArray){
@@ -201,7 +222,9 @@ public class Menu {
         maxForAll -= processSize;
         
         if(maxForAll < 0){
-            System.out.println("max was reached");
+            MemoryBlock newBlock = new MemoryBlock(pid, processSize, 0, processSize);
+            System.out.println("Process " + Integer.toString(pid) + " can't fit within main memory. It has been moved to the waiting queue!");
+            waitingQueue.add(newBlock);
             return true;
         }else{
             return false;
@@ -219,20 +242,34 @@ public class Menu {
     public void sortMemoryBlocks() 
     {
         SortBlocks comparator = new SortBlocks();
-        sortedMemory = new MemoryBlock[blocks.size()];
-//        for(int i = 0; blocks.size() > i; i++)
-//        {
-//            for(int j = i + 1; blocks.size() > j; j++)
-//            {
-//                if(blocks.get(i).getMin() >= blocks.get(i).getMax())
-//                {
-//                    //comparator.compare(blocks.get(i), blocks.get(j));
-//                    Collections.sort(blocks, comparator);
-//                }
-//            }
-//        }
-        
         Collections.sort(blocks, comparator);
 
+    }
+
+    public void addInWaitingQueue() 
+    {
+        for(int i = 0; i < waitingQueue.size(); i++)
+        {
+            System.out.println("Witin waitingQueue for loop!");
+            for(int j = 0; j < removedProcesses.size(); j++)
+            {
+                System.out.println("Within removedProcesses for loop!");
+                if(waitingQueue.get(i).getProcessSize() <= removedProcesses.get(j).getProcessSize())
+                {
+                    waitingQueue.get(i).setMin(removedProcesses.get(j).getMin());
+                    waitingQueue.get(i).setMax(removedProcesses.get(j).getMin() + waitingQueue.get(i).getProcessSize());
+                    blocks.add(waitingQueue.get(i));
+                    System.out.println("Process " + Integer.toString(waitingQueue.get(i).getPid()) + " has been moved from the waiting queue into"
+                                        + " main memory!");
+                    removedProcesses.add(new MemoryBlock(this.pid, removedProcesses.get(j).getProcessSize()-waitingQueue.get(i).getProcessSize(),
+                                                        waitingQueue.get(i).getMax(), waitingQueue.get(i).getMax()
+                                                                + waitingQueue.get(i).getProcessSize()));
+                    waitingQueue.remove(i);
+                    removedProcesses.remove(j);
+                    
+                    //Might have to add trimToSize for both arraylists
+                }
+            }
+        }
     }
 }
