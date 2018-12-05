@@ -2,6 +2,7 @@ package memorymanager;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Collections;
 
 public class Menu {
     private ArrayList<Integer> pids = new ArrayList();
@@ -16,6 +17,7 @@ public class Menu {
     private boolean processAdded = true;
     static private ArrayList<MemoryBlock> blocks = new ArrayList();
     private ArrayList<MemoryBlock> removedProcesses = new ArrayList();
+    private MemoryBlock[] sortedMemory;
     private boolean maxReached = false;
     private boolean notFitInRemoved = false;
     
@@ -25,7 +27,7 @@ public class Menu {
         int process = -1;
         boolean inArray = false;
         
-        MemoryBlock block = new MemoryBlock();
+        MemoryBlock block = new MemoryBlock() {};
         while(menuChoice != 7){
             System.out.println("");
             System.out.println("************************************************************");
@@ -76,6 +78,7 @@ public class Menu {
                 case 5:
                     System.out.println();
                     sortMemoryBlocks();
+                    System.out.println(Integer.toString(blocks.size()) + " = size of blocks array");
                     System.out.println("PID\t\tProcess Size\t\tMin\t\tMax");
                     for(int i = 0; i < blocks.size(); i++){
                         System.out.printf("%d\t\t%d\t\t\t%d\t\t%d\n", 
@@ -215,12 +218,21 @@ public class Menu {
 
     public void sortMemoryBlocks() 
     {
-        for(int i = 0; blocks.size() > i; i++)
-        {
-            for(int j = i + 1; blocks.size() > j; j++)
-            {
-                
-            }
-        }
+        SortBlocks comparator = new SortBlocks();
+        sortedMemory = new MemoryBlock[blocks.size()];
+//        for(int i = 0; blocks.size() > i; i++)
+//        {
+//            for(int j = i + 1; blocks.size() > j; j++)
+//            {
+//                if(blocks.get(i).getMin() >= blocks.get(i).getMax())
+//                {
+//                    //comparator.compare(blocks.get(i), blocks.get(j));
+//                    Collections.sort(blocks, comparator);
+//                }
+//            }
+//        }
+        
+        Collections.sort(blocks, comparator);
+
     }
 }
