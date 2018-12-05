@@ -113,6 +113,12 @@ public class Menu {
                     }
                     break;
                 case 6:
+                    for(int i = 0; i < blocks.size(); i++)
+                    {
+                        compactMemory();
+                    }
+                    sortMemoryBlocks();
+                    System.out.println("Memory compacted!");
                     break;
                 case 7:
                     System.exit(0);
@@ -211,6 +217,7 @@ public class Menu {
 //                blocks.add(newBlock);
 //            }
         }
+        sortMemoryBlocks();
     }
   
     public static boolean checkOverflow(int processSize){
@@ -243,7 +250,6 @@ public class Menu {
     {
         SortBlocks comparator = new SortBlocks();
         Collections.sort(blocks, comparator);
-
     }
 
     public void addInWaitingQueue() 
@@ -268,6 +274,39 @@ public class Menu {
                     removedProcesses.remove(j);
                     
                     //Might have to add trimToSize for both arraylists
+                }
+            }
+        }
+    }
+
+    public void compactMemory() 
+    {
+        MemoryBlock compactBlock;
+        int almostOut = blocks.size() - 1;
+        for(int i = 0; i < blocks.size(); i++)
+        {
+            for(int j = 0; j < removedProcesses.size(); j++)
+            {
+                if(blocks.get(i).getMax() >= removedProcesses.get(j).getMax())
+                {
+                    blocks.get(i).setMin(removedProcesses.get(j).getMin());
+                    blocks.get(i).setMax(blocks.get(i).getMin() + blocks.get(i).getProcessSize());
+                    if(i == almostOut)
+                    {
+                        removedProcesses.add(new MemoryBlock(pid, removedProcesses.get(j).getProcessSize() - blocks.get(i).getProcessSize(),
+                                                            blocks.get(i).getMax(), 500));
+                        removedProcesses.remove(j);
+                        
+                    }
+                    else
+                    {
+                    removedProcesses.add(new MemoryBlock(pid, removedProcesses.get(j).getProcessSize() - blocks.get(i).getProcessSize(),
+                                                            blocks.get(i).getMax(), blocks.get(i+1).getMin()));
+                    removedProcesses.remove(j);
+                    
+                    }
+                    break;
+                    
                 }
             }
         }
