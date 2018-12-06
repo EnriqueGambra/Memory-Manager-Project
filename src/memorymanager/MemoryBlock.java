@@ -58,5 +58,10 @@ public  class MemoryBlock  {
         s += this.max + "\n";
         return s;
     }
+    
+    public MemoryBlock clone()
+    {
+        return new MemoryBlock(this.pid, this.processSize, this.min, this.max);
+    }
 
 }
